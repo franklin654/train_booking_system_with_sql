@@ -49,19 +49,19 @@ ticket_gen::ticket_gen(int train_no, QDate date, QString src, QString d, QWidget
     connect(ui->confirm, &QPushButton::clicked, this, [=](){
         qInfo() << t.train_class();
         QSqlQuery query;
-        QString cmd = "INSERT INTO `train_schema`.`tickets` (`passenger`, `train_number`, `Class`, `price`, `Source`, `Destination`, `Seat`, `date`) VALUES (:passenger, :train_number, :Class, :price, :src, :dst, :seat, :date);";
+        QString cmd = "INSERT INTO `train_schema`.`tickets` (`passenger`, `train_number`, `train_name`, `Class`, `price`, `Source`, `Destination`, `Seat`, `date`) VALUES (:passenger, :train_number, :trainname, :Class, :price, :src, :dst, :seat, :date);";
         query.prepare(cmd);
         query.bindValue(":passenger",ui->name->text());
         query.bindValue(":train_number", train_no);
+        query.bindValue(":trainname", t.trainname);
         query.bindValue(":Class", t.train_class());
         query.bindValue(":price", ui->cost->text().toInt());
         query.bindValue(":src", ui->source->text());
         query.bindValue(":dst", ui->dest->text());
         query.bindValue(":seat", seat);
         query.bindValue(":date", date.toString("dd.MM.yyyy"));
-        if(query.exec()) {
-            ticket_id = query.lastInsertId().toInt();
-        }
+        query.exec();
+        int ticket_number = query.lastInsertId().toInt();
         if(t.train_class() == "Class 1") {
             cmd = "UPDATE `train_schema`.`train` SET `1stclasscapacity` = `1stclasscapacity` - 1, `capacity` = `capacity`-1 WHERE `train`.`TrainNumber` = :trno;";
         }
@@ -74,8 +74,7 @@ ticket_gen::ticket_gen(int train_no, QDate date, QString src, QString d, QWidget
         query.prepare(cmd);
         query.bindValue(":trno", train_no);
         query.exec();
-        this->dtick = new disp_ticket();
-        dtick->set_tid(ticket_id);
+        this->dtick = new disp_ticket(ticket_number);
         this->hide();
         dtick->show();
     });

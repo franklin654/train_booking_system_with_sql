@@ -1,5 +1,6 @@
 #include "widget.h"
 #include "user.h"
+#include "disp_ticket.h"
 #include "journey.h"
 #include "./ui_widget.h"
 #include <QSql>
@@ -12,6 +13,11 @@ Widget::Widget(QWidget *parent)
 {
     ui->setupUi(this);
     connect(ui->signup, &QPushButton::clicked, this, &Widget::signup_handler);
+    connect(ui->tic_button, &QPushButton::clicked, this, [=](){
+        dt = new disp_ticket(ui->tick_no->text().toInt());
+        this->hide();
+        dt->show();
+    });
 
 }
 
@@ -19,6 +25,7 @@ Widget::~Widget()
 {
     delete ui;
     delete j;
+    delete dt;
 }
 
 
@@ -27,7 +34,7 @@ void Widget::on_login_clicked()
     user u(ui->username->text(), ui->password->text());
     if(u.check_login()) {
         this->hide();
-        j = new journey;
+        j = new journey();
         j->show();
     }
     else {

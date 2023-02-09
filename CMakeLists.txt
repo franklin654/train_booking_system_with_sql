@@ -30,6 +30,8 @@ set(PROJECT_SOURCES
         disp_ticket.h
         disp_ticket.cpp
         disp_ticket.ui
+        ticket.h
+        ticket.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

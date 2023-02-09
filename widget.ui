@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Widget</string>
   </property>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>100</x>
@@ -78,6 +78,32 @@
      </layout>
     </item>
    </layout>
+  </widget>
+  <widget class="QLineEdit" name="tick_no">
+   <property name="geometry">
+    <rect>
+     <x>130</x>
+     <y>170</y>
+     <width>113</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="placeholderText">
+    <string>ticket number</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="tic_button">
+   <property name="geometry">
+    <rect>
+     <x>140</x>
+     <y>200</y>
+     <width>80</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>print</string>
+   </property>
   </widget>
  </widget>
  <resources/>

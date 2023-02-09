@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include "journey.h"
+#include "disp_ticket.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class Widget; }
@@ -23,5 +24,6 @@ private slots:
 private:
     Ui::Widget *ui;
     journey *j;
+    disp_ticket *dt;
 };
 #endif // WIDGET_H
