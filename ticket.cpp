@@ -5,6 +5,7 @@
 #include <QSqlError>
 #include <QSqlDatabase>
 #include <QDebug>
+#include <QMessageBox>
 
 ticket::ticket(QObject* parent):QObject(parent) {
     ticket_id = 0;
@@ -13,6 +14,7 @@ ticket::ticket(QObject* parent):QObject(parent) {
 ticket::ticket(int t, QObject* parent) : QObject(parent), ticket_id(t)
 {
     set_details();
+
 }
 
 void ticket::set_details() {
@@ -21,7 +23,7 @@ void ticket::set_details() {
     query.prepare(cmd);
     query.bindValue(":tickid", this->ticket_id);
     if(query.exec()) {
-        if(query.next()) {
+        if(query.next() != NULL) {
             this->passenger = query.value(0).toString();
             qInfo()<<this->passenger;
             this->train_number = query.value(1).toInt();
@@ -38,6 +40,10 @@ void ticket::set_details() {
         }
         else {
             qInfo() << query.executedQuery();
+            QMessageBox wrong_ticket_id;
+            wrong_ticket_id.setWindowTitle("wrong id");
+            wrong_ticket_id.setWindowTitle("PLEASE CHECK THE TICKET NUMBER YOU HAVE ENTERED!!!");
+            wrong_ticket_id.open();
         }
     }
     else {

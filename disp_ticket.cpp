@@ -11,8 +11,9 @@ disp_ticket::disp_ticket(QWidget *parent) :
 {
     ui->setupUi(this);
 }
-disp_ticket::disp_ticket(int ticket_no, QWidget* parent) :
+disp_ticket::disp_ticket(int ticket_no, QWidget *prev, QWidget* parent) :
     QWidget(parent),
+    prev(prev),
     ui(new Ui::disp_ticket)
 {
     ui->setupUi(this);
@@ -26,8 +27,12 @@ disp_ticket::disp_ticket(int ticket_no, QWidget* parent) :
     ui->source->setText(t->Source);
     ui->dest->setText(t->Destination);
     ui->passenger->setText(t->passenger);
-    ui->seat_no->setText(t->Class +"|"+QVariant(t->Seat).toString());
+    ui->seat_no->setText(t->Class +"\\"+QVariant(t->Seat).toString());
     ui->date->setText(t->date);
+    QPalette p = palette(); //copy current, not create new
+    p.setBrush(QPalette::Window, Qt::gray);
+    this->setPalette(p);
+
 }
 disp_ticket::~disp_ticket()
 {

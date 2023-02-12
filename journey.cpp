@@ -11,17 +11,32 @@
 #include <QHBoxLayout>
 #include <QBoxLayout>
 
-journey::journey(QWidget *parent) :
-    QWidget(parent),
+journey::journey(QWidget* prev, QWidget *parent) :
+    QWidget(parent),prev(prev),
     ui(new Ui::journey)
 {
     this->jlayout = new QBoxLayout(QBoxLayout::TopToBottom, this);
     this->setLayout(jlayout);
     ui->setupUi(this);
+    ui->dateEdit->setMinimumDate(QDate::currentDate());
     ui->verticalLayout->setAlignment(Qt::AlignLeft);
     ui->dateEdit->setDate(QDate::currentDate());
-    jlayout->setAlignment(Qt::AlignLeft);
+    jlayout->setAlignment(Qt::AlignHCenter|Qt::AlignBottom);
+    this->trdbox = new QVBoxLayout(nullptr);
+    jlayout->addLayout(trdbox);
     connect(ui->submit, &QPushButton::clicked,this, &journey::display_trains);
+    ui->label->adjustSize();
+    connect(ui->pushButton, &QPushButton::clicked, this, [=](){
+        this->hide();
+        prev->show();
+    });
+    if(prev == nullptr) {
+        ui->pushButton->hide();
+    }
+    QPalette p = palette(); //copy current, not create new
+    p.setBrush(QPalette::Window, Qt::gray);
+    this->setPalette(p);
+
 }
 
 journey::~journey()
@@ -38,22 +53,39 @@ void journey::display_trains() {
     query.prepare(cmd);
     query.bindValue(":src", this->source);
     query.bindValue(":dest", this->dest);
-    QVBoxLayout* trdbox = new QVBoxLayout();
+    if(trdbox->layout() != NULL) {
+        QLayoutItem* item;
+        QWidget* w;
+        QLayout* sub_l;
+            while ( ( item = trdbox->layout()->takeAt(0)))
+            {
+                if((sub_l = item->layout()) != 0) {
+                    QLayoutItem* item2;
+                    QWidget* w1;
+                    while((item2 = sub_l->layout()->takeAt(0))) {
+                        w1 = item2->widget();
+                        delete w1;
+                    }
+                    delete sub_l;
+                }
+            }
+    }
     if(query.exec()) {
+        qInfo() << query.executedQuery() << query.size();
         if(query.size() > 0) {
         while(query.next()) {
             if(query.value(5).toInt() > 0) {
             QHBoxLayout* trdis = new QHBoxLayout();
-            QPushButton* train = new QPushButton(this);
-            train->setText(query.value(0).toString());
+            QPushButton* train_d = new QPushButton();
+            train_d->setText(query.value(0).toString());
             QString tr_d =  query.value(1).toString()+" "+query.value(2).toString()+" "+query.value(3).toString()+" "+query.value(4).toString();
-            QLabel* train_details = new QLabel(tr_d, this);
+            QLabel* train_details = new QLabel(tr_d);
             train_details->setFixedHeight(10);
-            train->setFixedWidth(100);
-            trdis->addWidget(train);
+            train_d->setFixedWidth(100);
+            trdis->addWidget(train_d);
             trdis->addWidget(train_details);
             trdbox->addLayout(trdis);
-            connect(train, &QPushButton::clicked,this, [=](){this->book_ticket(train);});
+            connect(train_d, &QPushButton::clicked,this, [=](){this->book_ticket(train_d);});
             }else {
                 qInfo() << "no vacancy in" << query.value(1).toString();
                 continue;
@@ -70,14 +102,13 @@ void journey::display_trains() {
         qInfo() << query.lastError().text();
     }
     trdbox->setSpacing(0);
-    this->jlayout->addLayout(trdbox);
 
     //trbox->setAlignment(Qt::AlignLeft);
 }
 
 void journey::book_ticket( QPushButton* button) {
     qInfo() << "this train was selected"<<button->text();
-    tick = new ticket_gen(button->text().toInt(), ui->dateEdit->date(), this->source, this->dest);
+    tick = new ticket_gen(button->text().toInt(), ui->dateEdit->date(), this->source, this->dest, this);
     this->hide();
     tick->show();
 }

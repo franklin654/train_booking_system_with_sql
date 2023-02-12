@@ -1,4 +1,5 @@
 #include "widget.h"
+#include "qmessagebox.h"
 #include "user.h"
 #include "disp_ticket.h"
 #include "journey.h"
@@ -6,6 +7,7 @@
 #include <QSql>
 #include <QSqlQuery>
 #include <QDebug>
+#include <QPalette>
 
 Widget::Widget(QWidget *parent)
     : QWidget(parent)
@@ -18,6 +20,12 @@ Widget::Widget(QWidget *parent)
         this->hide();
         dt->show();
     });
+
+
+    QPalette p = palette(); //copy current, not create new
+    p.setBrush(QPalette::Window, Qt::gray);
+    this->setPalette(p);
+
 
 }
 
@@ -34,7 +42,7 @@ void Widget::on_login_clicked()
     user u(ui->username->text(), ui->password->text());
     if(u.check_login()) {
         this->hide();
-        j = new journey();
+        j = new journey(this);
         j->show();
     }
     else {
@@ -50,6 +58,12 @@ void Widget::signup_handler() {
     query_ins.bindValue(":password", ui->password->text());
     if(query_ins.exec()) {
         qInfo() << "User signed up";
+    }
+    else {
+        QMessageBox *singnuperr = new  QMessageBox(this);
+        singnuperr->setText("USERNAME ALREADY EXISTS PLEASE USE ANOTHER!!!");
+        singnuperr->setWindowTitle("SIGNUP ERROR");
+        singnuperr->open();
     }
 }
 

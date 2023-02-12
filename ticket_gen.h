@@ -14,8 +14,9 @@ class ticket_gen : public QWidget
     Q_OBJECT
 
 public:
+    QWidget* prev;
     explicit ticket_gen(QWidget *parent = nullptr);
-    ticket_gen(int train_no, QDate date, QString src, QString d, QWidget *parent = nullptr);
+    ticket_gen(int train_no, QDate date, QString src, QString d, QWidget *prev=nullptr, QWidget *parent = nullptr);
     void classes_available();
     ~ticket_gen();
 

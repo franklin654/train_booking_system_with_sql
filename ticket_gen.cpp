@@ -13,7 +13,7 @@ ticket_gen::ticket_gen(QWidget *parent) :
     ui->setupUi(this);
 }
 
-ticket_gen::ticket_gen(int train_no, QDate date, QString src, QString d, QWidget* parent):QWidget(parent), ui(new Ui::ticket_gen)
+ticket_gen::ticket_gen(int train_no, QDate date, QString src, QString d,QWidget* prev, QWidget* parent):QWidget(parent), prev(prev), ui(new Ui::ticket_gen)
 {
     ui->setupUi(this);
     t.set_train_no(train_no);
@@ -28,6 +28,7 @@ ticket_gen::ticket_gen(int train_no, QDate date, QString src, QString d, QWidget
     connect(ui->radioButton, &QRadioButton::toggled, this, [=](){
         if(ui->radioButton->isChecked()) {
             ui->cost->setText(QVariant(t.cs1).toString());
+            ui->cost->adjustSize();
             t.set_class_type(ui->radioButton->text());
             this->seat = t.c1;
         }
@@ -35,6 +36,7 @@ ticket_gen::ticket_gen(int train_no, QDate date, QString src, QString d, QWidget
     connect(ui->radioButton_2, &QRadioButton::toggled, this, [=](){
         if(ui->radioButton_2->isChecked()) {
             ui->cost->setText(QVariant(t.cs2).toString());
+            ui->cost->adjustSize();
             t.set_class_type(ui->radioButton_2->text());
             this->seat = t.c2;
         }
@@ -42,6 +44,7 @@ ticket_gen::ticket_gen(int train_no, QDate date, QString src, QString d, QWidget
     connect(ui->radioButton_3, &QRadioButton::toggled, this, [=](){
         if(ui->radioButton_3->isChecked()) {
             ui->cost->setText(QVariant(t.cs3).toString());
+            ui->cost->adjustSize();
             t.set_class_type(ui->radioButton_3->text());
             this->seat = t.c3;
         }
@@ -78,6 +81,14 @@ ticket_gen::ticket_gen(int train_no, QDate date, QString src, QString d, QWidget
         this->hide();
         dtick->show();
     });
+    connect(ui->pushButton, &QPushButton::clicked, this, [=](){
+        this->hide();
+        prev->show();
+    });
+
+    QPalette p = palette(); //copy current, not create new
+    p.setBrush(QPalette::Window, Qt::gray);
+    this->setPalette(p);
 }
 
 void ticket_gen::classes_available() {
